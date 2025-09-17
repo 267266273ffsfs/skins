@@ -3,6 +3,8 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local player = Players.LocalPlayer
 local backpack = player:WaitForChild("Backpack")
+
+-- // IDs para equipar
 local itemIDs = {
     17770317484,
     17772174303,
@@ -17,9 +19,32 @@ local itemIDs = {
     11274394350
 }
 
--- // Função para equipar itens e disparar remote
+-- // Função principal
 local function equipItems()
-    -- Remove duplicatas
+    -- 1️⃣ ResetCharacterAppearance
+    local resetRemote = ReplicatedStorage:WaitForChild("Remotes"):FindFirstChild("ResetCharacterAppearance")
+    if resetRemote then
+        pcall(function()
+            resetRemote:FireServer()
+        end)
+        print("🔄 ResetCharacterAppearance executado!")
+    else
+        warn("❌ Remote ResetCharacterAppearance não encontrado!")
+    end
+
+    -- 2️⃣ ApplyEmmiter
+    local applyRemote = ReplicatedStorage:WaitForChild("Remotes"):FindFirstChild("ApplyEmmiter")
+    if applyRemote then
+        local args = { [1] = 18635837646, [2] = "0009FreeRed" }
+        pcall(function()
+            applyRemote:InvokeServer(unpack(args))
+        end)
+        print("✨ ApplyEmmiter executado!")
+    else
+        warn("❌ Remote ApplyEmmiter não encontrado!")
+    end
+
+    -- 3️⃣ Equipar itens (removendo duplicatas)
     local seen = {}
     local uniqueList = {}
     for _, id in ipairs(itemIDs) do
@@ -29,7 +54,6 @@ local function equipItems()
         end
     end
 
-    -- Equipar cada item
     for _, id in ipairs(uniqueList) do
         local success, err = pcall(function()
             ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("Wear"):InvokeServer(id)
@@ -42,12 +66,12 @@ local function equipItems()
         task.wait(0.3)
     end
 
-    -- Executa o ChangeBodyColor
+    -- 4️⃣ ChangeBodyColor
     local bodyColorRemote = ReplicatedStorage:WaitForChild("Remotes"):FindFirstChild("ChangeBodyColor")
     if bodyColorRemote then
         local args = { [1] = "Really black" }
         bodyColorRemote:FireServer(unpack(args))
-        print("🎨 Remote ChangeBodyColor executado com sucesso!")
+        print("🎨 ChangeBodyColor executado!")
     else
         warn("❌ Remote ChangeBodyColor não encontrado!")
     end
@@ -55,14 +79,14 @@ end
 
 -- // Cria a Tool
 local tool = Instance.new("Tool")
-tool.Name = "apareçer"
+tool.Name = "Reaparecer"
 tool.RequiresHandle = false
 tool.CanBeDropped = false
 tool.Parent = backpack
 
--- // Conectar evento de clique
+-- // Evento de clique
 tool.Activated:Connect(function()
     equipItems()
 end)
 
-print("🛠️ Tool criada no Backpack! Clique para equipar os itens.")
+print("🛠️ Tool criada no Backpack! Clique para executar todos os remotes e equipar os itens.")
