@@ -32,6 +32,8 @@ local function equipItems()
         warn("❌ Remote ResetCharacterAppearance não encontrado!")
     end
 
+    task.wait(1) -- pequeno atraso entre os remotes
+
     -- 2️⃣ ApplyEmmiter
     local applyRemote = ReplicatedStorage:WaitForChild("Remotes"):FindFirstChild("ApplyEmmiter")
     if applyRemote then
@@ -44,7 +46,9 @@ local function equipItems()
         warn("❌ Remote ApplyEmmiter não encontrado!")
     end
 
-    -- 3️⃣ Equipar itens (removendo duplicatas)
+    task.wait(1) -- espera antes de começar a equipar os itens
+
+    -- 3️⃣ Equipar itens com delay de 2s entre cada
     local seen = {}
     local uniqueList = {}
     for _, id in ipairs(itemIDs) do
@@ -63,7 +67,7 @@ local function equipItems()
         else
             warn("⚠️ Falha ao equipar Item ID "..id.." | "..tostring(err))
         end
-        task.wait(0.3)
+        task.wait(2) -- <-- delay de 2 segundos entre cada item
     end
 
     -- 4️⃣ ChangeBodyColor
@@ -79,7 +83,7 @@ end
 
 -- // Cria a Tool
 local tool = Instance.new("Tool")
-tool.Name = "Reaparecer"
+tool.Name = "reaparecer"
 tool.RequiresHandle = false
 tool.CanBeDropped = false
 tool.Parent = backpack
@@ -89,4 +93,4 @@ tool.Activated:Connect(function()
     equipItems()
 end)
 
-print("🛠️ Tool criada no Backpack! Clique para executar todos os remotes e equipar os itens.")
+print("🛠️ Tool criada no Backpack! Clique para executar os remotes e equipar os itens com segurança.")
